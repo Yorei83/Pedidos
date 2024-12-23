@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Pedidos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <style>
         /* Estilo general */
         body {
@@ -33,7 +34,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, button {
+        input, button, textarea {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -82,6 +83,14 @@
             background-color: #d9534f;
             color: white;
         }
+        #datos-texto {
+            display: none;
+            margin-top: 10px;
+        }
+        #qrcode {
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -106,6 +115,10 @@
         </div>
         <button onclick="agregarOEditarPedido()">Guardar Pedido</button>
         <button onclick="exportarAPDF()">Exportar a PDF</button>
+        <button onclick="generarQRCode()">Generar Código QR</button>
+        <button onclick="mostrarDatos()">Mostrar Datos para Copiar</button>
+        <textarea id="datos-texto" readonly></textarea>
+        <div id="qrcode"></div>
 
         <div class="search-bar">
             <input type="text" id="buscar" placeholder="Buscar pedido..." oninput="mostrarPedidos()">
@@ -241,13 +254,26 @@
             doc.text("Lista de Pedidos", 10, 10);
             let y = 20;
 
-            // Exportar los pedidos en el orden actual de la tabla
             pedidos.forEach(pedido => {
                 doc.text(`Día: ${pedido.dia}, Hora: ${pedido.hora}, Número: ${pedido.numero}, Nombre: ${pedido.nombre}`, 10, y);
                 y += 10;
             });
 
             doc.save("lista_de_pedidos.pdf");
+        }
+
+        function generarQRCode() {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ''; // Limpiar QR previo
+            QRCode.toCanvas(qrContainer, JSON.stringify(pedidos), { width: 256 }, (error) => {
+                if (error) console.error(error);
+            });
+        }
+
+        function mostrarDatos() {
+            const textarea = document.getElementById('datos-texto');
+            textarea.value = JSON.stringify(pedidos, null, 2); // Convertir pedidos a JSON legible
+            textarea.style.display = 'block'; // Mostrar área de texto
         }
 
         mostrarPedidos();
