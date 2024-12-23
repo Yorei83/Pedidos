@@ -241,15 +241,8 @@
             doc.text("Lista de Pedidos", 10, 10);
             let y = 20;
 
-            // Ordenar los pedidos por día, hora, número y luego nombre
-            const pedidosOrdenados = [...pedidos].sort((a, b) => {
-                if (a.dia !== b.dia) return a.dia.localeCompare(b.dia);
-                if (a.hora !== b.hora) return a.hora.localeCompare(b.hora);
-                if (a.numero !== b.numero) return a.numero - b.numero;
-                return a.nombre.localeCompare(b.nombre);
-            });
-
-            pedidosOrdenados.forEach(pedido => {
+            // Exportar los pedidos en el orden actual de la tabla
+            pedidos.forEach(pedido => {
                 doc.text(`Día: ${pedido.dia}, Hora: ${pedido.hora}, Número: ${pedido.numero}, Nombre: ${pedido.nombre}`, 10, y);
                 y += 10;
             });
