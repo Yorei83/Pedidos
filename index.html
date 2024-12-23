@@ -82,12 +82,17 @@
             background-color: #d9534f;
             color: white;
         }
+        .delete-all-btn {
+            background-color: #d9534f;
+            color: white;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Pedidos 2024</h1>
-        <h2>Carniceria Manuel Bonmati</h2>
+        <h2>Carnicería Manuel Bonmatí</h2>
         <div class="form-group">
             <label for="nombre">Nombre del Pedido</label>
             <input type="text" id="nombre" placeholder="Ej. Pedido A">
@@ -126,6 +131,9 @@
                 <!-- Aquí se mostrarán los pedidos -->
             </tbody>
         </table>
+
+        <!-- Botón para borrar todos los pedidos -->
+        <button class="delete-all-btn" onclick="borrarTodosLosPedidos()">Borrar todos los pedidos</button>
     </div>
 
     <script>
@@ -170,6 +178,18 @@
                 pedidos.splice(index, 1);
                 guardarPedidos();
                 mostrarPedidos();
+            }
+        }
+
+        function borrarTodosLosPedidos() {
+            const confirmacion1 = confirm('¿Estás seguro de que deseas eliminar todos los pedidos?');
+            if (confirmacion1) {
+                const confirmacion2 = confirm('Esta acción no se puede deshacer. ¿Confirmas que deseas borrar todos los pedidos?');
+                if (confirmacion2) {
+                    pedidos = [];
+                    guardarPedidos();
+                    mostrarPedidos();
+                }
             }
         }
 
