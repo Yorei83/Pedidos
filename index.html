@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Pedidos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <style>
         /* Estilo general */
         body {
@@ -104,7 +105,8 @@
             <input type="time" id="hora">
         </div>
         <button onclick="agregarOEditarPedido()">Guardar Pedido</button>
-        
+        <button onclick="exportarAPDF()">Exportar a PDF</button>
+
         <div class="search-bar">
             <input type="text" id="buscar" placeholder="Buscar pedido..." oninput="mostrarPedidos()">
         </div>
@@ -139,12 +141,10 @@
 
             if (nombre && numero && dia && hora) {
                 if (indexEdicion === null) {
-                    // Nuevo pedido
-                    pedidos.push({ nombre, numero, dia, hora });
+                    pedidos.push({ nombre, numero: parseInt(numero, 10), dia, hora });
                 } else {
-                    // Editar pedido existente
-                    pedidos[indexEdicion] = { nombre, numero, dia, hora };
-                    indexEdicion = null; // Resetear
+                    pedidos[indexEdicion] = { nombre, numero: parseInt(numero, 10), dia, hora };
+                    indexEdicion = null;
                 }
 
                 guardarPedidos();
@@ -162,7 +162,7 @@
             document.getElementById('dia').value = pedido.dia;
             document.getElementById('hora').value = pedido.hora;
 
-            indexEdicion = index; // Marcar el índice en edición
+            indexEdicion = index;
         }
 
         function borrarPedido(index) {
@@ -184,7 +184,7 @@
 
             const pedidosFiltrados = pedidos.filter(pedido => 
                 pedido.nombre.toLowerCase().includes(filtro) ||
-                pedido.numero.includes(filtro) ||
+                pedido.numero.toString().includes(filtro) ||
                 pedido.dia.includes(filtro) ||
                 pedido.hora.includes(filtro)
             );
@@ -215,9 +215,13 @@
             }
 
             pedidos.sort((a, b) => {
-                if (a[campo] > b[campo]) return ordenActual.asc ? 1 : -1;
-                if (a[campo] < b[campo]) return ordenActual.asc ? -1 : 1;
-                return 0;
+                if (campo === 'numero') {
+                    return ordenActual.asc ? a[campo] - b[campo] : b[campo] - a[campo];
+                } else {
+                    if (a[campo] > b[campo]) return ordenActual.asc ? 1 : -1;
+                    if (a[campo] < b[campo]) return ordenActual.asc ? -1 : 1;
+                    return 0;
+                }
             });
 
             mostrarPedidos();
@@ -230,8 +234,22 @@
             document.getElementById('hora').value = '';
         }
 
+        function exportarAPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text("Lista de Pedidos", 10, 10);
+            let y = 20;
+
+            pedidos.forEach(pedido => {
+                doc.text(`Nombre: ${pedido.nombre}, Número: ${pedido.numero}, Día: ${pedido.dia}, Hora: ${pedido.hora}`, 10, y);
+                y += 10;
+            });
+
+            doc.save("lista_de_pedidos.pdf");
+        }
+
         mostrarPedidos();
     </script>
 </body>
 </html>
-
